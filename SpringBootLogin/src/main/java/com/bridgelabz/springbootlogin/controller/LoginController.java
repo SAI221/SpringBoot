@@ -27,7 +27,7 @@ public class LoginController {
 		 * Date()) .signWith(SignatureAlgorithm.HS256, "secretkey").compact();
 		 * 
 		 * else return "Invalid User Details";
-		 */ 
+		 */
 		return userservice.login(user);
 	}
 

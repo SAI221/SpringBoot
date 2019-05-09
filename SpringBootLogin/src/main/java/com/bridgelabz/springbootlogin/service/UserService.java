@@ -8,4 +8,5 @@ public interface UserService {
 	public String login(User user);
 	public String securePassword(User user);
 	public User saveUser(User user);
+	
 }

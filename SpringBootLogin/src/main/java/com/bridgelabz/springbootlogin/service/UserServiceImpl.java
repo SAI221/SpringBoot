@@ -2,6 +2,7 @@ package com.bridgelabz.springbootlogin.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.springbootlogin.model.User;
 import com.bridgelabz.springbootlogin.repository.UserRepository;
+
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,7 +31,9 @@ public class UserServiceImpl implements UserService {
 
 		if (userList.size() != 0) {
 			System.out.println(user.getEmail());
-			return "Welcome  " + user.getUserName();
+			
+			 
+			return "Welcome  " + user.getUserName()+"   Jwt Token--->"+jwtToken("secretKey", user.getUserName());
 		} else
 			return "invalid User Details";
 
@@ -81,5 +88,23 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(givenUser);
 		return givenUser;
 	}
+	public String jwtToken(String secretKey,String subject) {
+		
+		
+		  long nowMillis = System.currentTimeMillis(); Date now = new Date(nowMillis);
+		 
 
-}
+	        JwtBuilder builder = Jwts.builder()
+	                .setSubject(subject)
+	                .setIssuedAt(now)
+	                .signWith(SignatureAlgorithm.HS256, secretKey);
+
+	        return builder.compact();
+	        //return Jwts.parser().setSigningKey(signingKey).parseClaimsJws(user.getPassword()).getBody().getSubject();
+	    }
+
+	   
+		
+		
+	}
+
