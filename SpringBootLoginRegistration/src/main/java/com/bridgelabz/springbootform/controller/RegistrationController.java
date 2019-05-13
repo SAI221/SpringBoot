@@ -1,4 +1,4 @@
-package com.bridgelabz.springbootlogin.controller;
+package com.bridgelabz.springbootform.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -6,18 +6,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.springbootlogin.model.User;
-import com.bridgelabz.springbootlogin.service.UserService;
+import com.bridgelabz.springbootform.model.UserDetails;
+import com.bridgelabz.springbootform.service.UserService;
 
 @RestController
 
 public class RegistrationController {
-	@Autowired
-	UserService userservice;
 
-//registration
+	@Autowired
+	UserService userService;
+
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
-	public User createStudent(@RequestBody User user) {
-		return userservice.saveUser(user);
+	public UserDetails createStudent(@RequestBody UserDetails user) {
+		return userService.UserRegistration(user);
 	}
 }

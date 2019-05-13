@@ -18,7 +18,6 @@ public class LoginController {
 //find
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String getUserByLogin(@RequestBody User user) {
-
 		/*
 		 * int result=userservice.login(user); if(result>0) {
 		 * System.out.println(user.getFirstName()); return
@@ -29,6 +28,12 @@ public class LoginController {
 		 * else return "Invalid User Details";
 		 */
 		return userservice.login(user);
+	}
+	@RequestMapping(value="/forgot",method=RequestMethod.POST)
+	public String forgot(@RequestBody User user) {
+		userservice.forgotPassword(user);
+		return "Sent";
+		
 	}
 
 }
