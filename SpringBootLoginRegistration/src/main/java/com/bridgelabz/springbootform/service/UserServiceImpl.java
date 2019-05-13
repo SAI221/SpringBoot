@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,37 +69,65 @@ public class UserServiceImpl implements UserService {
 	private static final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
 
 	@Override
-	public String jwtToken(String subject) {
+	public String jwtToken(int id) {
 
 		long nowMillis = System.currentTimeMillis();
 		Date now = new Date(nowMillis);
 
-		JwtBuilder builder = Jwts.builder().setSubject(subject).setIssuedAt(now).signWith(SignatureAlgorithm.HS256,
+		JwtBuilder builder = Jwts.builder().setSubject(String.valueOf(id)).setIssuedAt(now).signWith(SignatureAlgorithm.HS256,
 				base64SecretBytes);
 
 		return builder.compact();
 	}
 
 	@Override
-	public String parseJWT(String jwt) {
+	public int parseJWT(String jwt) {
 
 		// This line will throw an exception if it is not a signed JWS (as expected)
 		Claims claims = Jwts.parser().setSigningKey(base64SecretBytes).parseClaimsJws(jwt).getBody();
 
 		System.out.println("Subject: " + claims.getSubject());
 
-		return claims.getSubject();
+		return Integer.parseInt(claims.getSubject());
 	}
 
 	@Override
-	public UserDetails updateUser(UserDetails user) {
-
-		return UserRegistration(user);
+	public UserDetails updateUser(String token,UserDetails user) {
+		int varifiedUserId=parseJWT(token);
+		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
+		UserDetails presentUser = maybeUser.map(existingUser -> {
+			existingUser.setEmail(user.getEmail() !=null ? user.getEmail() : maybeUser.get().getEmail());
+			existingUser.setMobileNo(user.getMobileNo() !=null ? user.getMobileNo() : maybeUser.get().getMobileNo());
+			existingUser.setUserName(user.getUserName() !=null ? user.getUserName() : maybeUser.get().getUserName());
+			existingUser.setPassword(user.getPassword() !=null ? user.getPassword() : maybeUser.get().getPassword());
+			return existingUser;
+		}).orElseThrow(() -> new RuntimeException("User Not Found"));
+		
+		return UserRegistration(presentUser);
 	}
 
 	@Override
-	public void deleteUser(String email) {
-		userRepository.deleteByUserName(email);
-
+	public boolean deleteUser(String token) {
+int varifiedUserId = parseJWT(token);
+		
+		//return userRep.deleteById(varifiedUserId);
+		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
+		return maybeUser.map(existingUser -> {
+			userRepository.delete(existingUser);
+			return true;
+			}).orElseGet(() -> false);
 	}
+
+	@Override
+	public List<UserDetails> findByEmailId(String email) {
+		
+		return userRepository.findByEmail(email);
+	}
+	@Override
+	public Optional<UserDetails> findById(int id)
+	{
+		return userRepository.findByUserId(id);
+	}
+
+	
 }

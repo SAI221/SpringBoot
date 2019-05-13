@@ -6,12 +6,12 @@ import javax.persistence.Id;
 @Entity
 public class UserDetails {
 	@Id
-	private String email;
 	private int userId;
 	private String userName;
 	private String password;
 	private String mobileNo;
 	private int activeStatus;
+	private String email;
 
 	public int getUserId() {
 		return userId;

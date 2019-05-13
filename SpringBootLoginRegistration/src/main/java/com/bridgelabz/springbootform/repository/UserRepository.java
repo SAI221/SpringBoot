@@ -1,6 +1,7 @@
 package com.bridgelabz.springbootform.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,8 +9,16 @@ import org.springframework.stereotype.Repository;
 import com.bridgelabz.springbootform.model.UserDetails;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserDetails, String> {
+public interface UserRepository extends JpaRepository<UserDetails, Long> {
 	public List<UserDetails> findByEmailAndPassword(String email, String password);
 
-	public void deleteByUserName(String userName);
+	public void deleteByUserId(int id);
+
+	public Optional<UserDetails> findByUserId(int id);
+	
+	public List<UserDetails> findByEmail(String email);
+
+	
+
+	
 }
