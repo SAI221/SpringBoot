@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Note {
@@ -17,9 +16,16 @@ public class Note {
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
+	private int userId;
 	
-	@ManyToOne
-	private UserDetails userId;
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 
 	public boolean isArchive() {
 		return isArchive;
