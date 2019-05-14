@@ -55,21 +55,9 @@ public class MailController {
 			UserDetails userdetails = list.get(0);
 			String token = userService.jwtToken(userdetails.getUserId());
 			response.setHeader("token", token);
-
-			MimeMessage message = sender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
-			String appUrl = request.getScheme() + "://" + request.getServerName();
-			try {
-
-				helper.setTo(userdetails.getEmail());
-				helper.setText("To reset your password, click the link below:\n" + appUrl + "/reset?token=" + token);
-				helper.setSubject("Password Reset Request");
-			} catch (MessagingException e) {
-				e.printStackTrace();
-				return "Error while sending mail ..";
-			}
-			sender.send(message);
-			return "Mail Sent Success!";
+			String subject = "Password Reset Request";
+			String appUrl = "request.getScheme() " + "://" + request.getServerName() + "/reset?token=" + token;
+			return userService.sendmail(subject, userdetails, appUrl);
 		}
 	}
 
@@ -87,40 +75,26 @@ public class MailController {
 			return "Not changed";
 
 	}
-	
-	@RequestMapping(value="/mail", method=RequestMethod.POST)
-	public String mailForActivation(@RequestBody UserDetails user,HttpServletRequest request,HttpServletResponse response)
-	{
-		List<UserDetails> list = userService.findByEmailId(user.getEmail());
-		if (list.size() == 0) {
+
+	@RequestMapping(value = "/mail", method = RequestMethod.POST)
+	public String mailForActivation(HttpServletRequest request) {
+		String token = request.getHeader("token");
+		int userId = userService.parseJWT(token);
+		Optional<UserDetails> list = userService.findById(userId);
+		if (list == null) {
 			return "We didn't find an account for that e-mail address.";
 		} else {
-			UserDetails userdetails = list.get(0);
-			String token = userService.jwtToken(userdetails.getUserId());
-			response.setHeader("token", token);
+			UserDetails userdetails = list.get();
 
-			MimeMessage message = sender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message);
-			String appUrl = "http://localhost:8080";
-			try {
-
-				helper.setTo(userdetails.getEmail());
-				helper.setText("To reset your password, click the link below:\n" + appUrl + "/active/token=" + token);
-				helper.setSubject("Password Reset Request");
-			} catch (MessagingException e) {
-				e.printStackTrace();
-				return "Error while sending mail ..";
-			}
-			sender.send(message);
-			return "Mail Sent Success!";
+			String appUrl = "http://localhost:8080" + "/active/token=" + token;
+			String subject = "To active your status";
+			return userService.sendmail(subject, userdetails, appUrl);
 		}
-		
-		
+
 	}
-	
-	@RequestMapping(value="/active", method=RequestMethod.PUT)
-	public String activeStatus(HttpServletRequest request)
-	{
+
+	@RequestMapping(value = "/active", method = RequestMethod.PUT)
+	public String activeStatus(HttpServletRequest request) {
 		String token = request.getHeader("token");
 
 		int id = userService.parseJWT(token);

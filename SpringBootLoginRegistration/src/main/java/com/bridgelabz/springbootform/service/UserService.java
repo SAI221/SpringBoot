@@ -23,5 +23,5 @@ public interface UserService {
 	
 	public Optional<UserDetails> findById(int id);
 	
-	
+	public String sendmail(String subject, UserDetails userdetails,String appUrl); 
 }

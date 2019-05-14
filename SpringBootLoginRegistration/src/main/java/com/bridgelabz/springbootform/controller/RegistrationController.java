@@ -20,4 +20,5 @@ public class RegistrationController {
 	public UserDetails createStudent(@RequestBody UserDetails user) {
 		return userService.UserRegistration(user);
 	}
+
 }

@@ -8,7 +8,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.springbootform.model.UserDetails;
@@ -24,6 +29,10 @@ import io.jsonwebtoken.impl.crypto.MacProvider;
 public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	JavaMailSender sender;
+	
 
 	@Override
 	public UserDetails UserRegistration(UserDetails user) {
@@ -128,6 +137,21 @@ int varifiedUserId = parseJWT(token);
 	{
 		return userRepository.findByUserId(id);
 	}
+	public String sendmail(String subject, UserDetails userdetails,String appUrl) {
+		MimeMessage message = sender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		
+		try {
 
+			helper.setTo(userdetails.getEmail());
+			helper.setText("To reset your password, click the link below:\n" + appUrl);
+			helper.setSubject(subject);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			return "Error while sending mail ..";
+		}
+		sender.send(message);
+		return "Mail Sent Success!";
+	}
 	
 }
