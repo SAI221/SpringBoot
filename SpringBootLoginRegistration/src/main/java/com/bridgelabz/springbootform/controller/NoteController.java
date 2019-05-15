@@ -13,47 +13,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.springbootform.model.Note;
 import com.bridgelabz.springbootform.service.NoteService;
-import com.bridgelabz.springbootform.service.UserService;
 
 @RestController
 public class NoteController {
 	@Autowired
+	
 	NoteService noteService;
 	
-	@Autowired
-	UserService userService;
 
-	@RequestMapping(value="/notecreate" ,method=RequestMethod.POST)
-	public Note noteCreate(@RequestBody Note note,HttpServletRequest request) 
-	{
+
+	@RequestMapping(value = "/notecreate", method = RequestMethod.POST)
+	public Note noteCreate(@RequestBody Note note, HttpServletRequest request) {
+		String token = request.getHeader("token");
+
+		return noteService.createNote(note, token);
+
+	}
+
+	@RequestMapping(value = "/noteupdate", method = RequestMethod.PUT)
+	public Note noteUpdate(@RequestBody Note note,HttpServletRequest request) {
 		String token=request.getHeader("token");
-		
-		return noteService.createNote(note,token);
-		
+		return noteService.updateNote(note, token);
+
 	}
-	@RequestMapping(value="/noteupdate/{noteId}",method=RequestMethod.PUT)
-	public Note noteUpdate(@RequestBody Note note,@PathVariable int noteId) {
-		
-		
-		return noteService.updateNote(note,noteId);
-		
-	}
-	
-	@RequestMapping(value="/notedelete/{noteId}",method=RequestMethod.DELETE)
-	public String noteDelete(@PathVariable int noteId) {
-		
-		return noteService.deleteNote(noteId);
-		
+
+	@RequestMapping(value = "/notedelete/{noteId}", method = RequestMethod.DELETE)
+	public String noteDelete(@PathVariable int noteId,HttpServletRequest request) {
+		String token=request.getHeader("token");
+		return noteService.deleteNote(noteId,token);
+
 	}
 	
-	@RequestMapping(value="/note/{noteId}",method=RequestMethod.GET)
+	
+
+	@RequestMapping(value = "/note/{noteId}", method = RequestMethod.GET)
 	public Note noteInfo(@PathVariable int noteId) {
 		return noteService.getNoteInfo(noteId);
-	
+
+	}
+
+	@RequestMapping(value = "/notes", method = RequestMethod.GET)
+	public List<Note> noteList() {
+		return noteService.getAllNotes();
 	}
 	
-	@RequestMapping(value="/notes",method=RequestMethod.GET)
-	public List<Note> noteList(){
-		return noteService.getAllNotes();
+	@RequestMapping(value="/notelist",method=RequestMethod.GET)
+	public List<Note> noteList(HttpServletRequest request){
+		String token=request.getHeader("token");
+		return noteService.getNotes(token);
 	}
 }

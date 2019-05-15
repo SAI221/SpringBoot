@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.springbootform.model.UserDetails;
 import com.bridgelabz.springbootform.service.UserService;
+import com.bridgelabz.springbootform.token.TokenClass;
 
 @RestController
 public class MailController {
@@ -27,6 +28,9 @@ public class MailController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	TokenClass tokenClass;
 
 	@RequestMapping(value = "/sendMail")
 	public String sendMail(@RequestBody UserDetails user) {
@@ -53,7 +57,7 @@ public class MailController {
 			return "We didn't find an account for that e-mail address.";
 		} else {
 			UserDetails userdetails = list.get(0);
-			String token = userService.jwtToken(userdetails.getUserId());
+			String token = tokenClass.jwtToken(userdetails.getUserId());
 			response.setHeader("token", token);
 			String subject = "Password Reset Request";
 			String appUrl = "request.getScheme() " + "://" + request.getServerName() + "/reset?token=" + token;
@@ -65,7 +69,7 @@ public class MailController {
 	public String changePassword(HttpServletRequest request, @RequestBody String password) {
 		String token = request.getHeader("token");
 
-		int id = userService.parseJWT(token);
+		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
 			Optional<UserDetails> userList = userService.findById(id);
 			userList.get().setPassword(password);
@@ -79,7 +83,7 @@ public class MailController {
 	@RequestMapping(value = "/mail", method = RequestMethod.POST)
 	public String mailForActivation(HttpServletRequest request) {
 		String token = request.getHeader("token");
-		int userId = userService.parseJWT(token);
+		int userId = tokenClass.parseJWT(token);
 		Optional<UserDetails> list = userService.findById(userId);
 		if (list == null) {
 			return "We didn't find an account for that e-mail address.";
@@ -97,7 +101,7 @@ public class MailController {
 	public String activeStatus(HttpServletRequest request) {
 		String token = request.getHeader("token");
 
-		int id = userService.parseJWT(token);
+		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
 			Optional<UserDetails> userList = userService.findById(id);
 			userList.get().setActiveStatus(1);

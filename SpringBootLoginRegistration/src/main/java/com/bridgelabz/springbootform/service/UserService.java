@@ -15,9 +15,11 @@ public interface UserService {
 
 	public boolean deleteUser(String token);
 
-	public String jwtToken(int id);
-
-	public int parseJWT(String jwt);
+	/*
+	 * public String jwtToken(int id);
+	 * 
+	 * public int parseJWT(String jwt);
+	 */
 	
 	public List<UserDetails> findByEmailId(String email);
 	

@@ -1,5 +1,7 @@
 package com.bridgelabz.springbootform.model;
 
+
+
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
@@ -11,13 +13,14 @@ public class Note {
 	private int noteId;
 	private String title;
 	private String description;
+	
+	
 	private Timestamp createdOn;
 	private Timestamp updatedOn;
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
 	private int userId;
-	
 
 	public int getUserId() {
 		return userId;
@@ -91,5 +94,4 @@ public class Note {
 		this.isPinned = isPinned;
 	}
 
-	
 }

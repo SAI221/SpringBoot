@@ -1,10 +1,7 @@
 package com.bridgelabz.springbootform.service;
 
-import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,21 +15,17 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.springbootform.model.UserDetails;
 import com.bridgelabz.springbootform.repository.UserRepository;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.crypto.MacProvider;
+import com.bridgelabz.springbootform.token.TokenClass;
 
 @Service
 public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	JavaMailSender sender;
-	
+	@Autowired
+	TokenClass tokenClass;
 
 	@Override
 	public UserDetails UserRegistration(UserDetails user) {
@@ -73,74 +66,75 @@ public class UserServiceImpl implements UserService {
 		return generatedPassword;
 	}
 
-	private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
-	private static final byte[] secretBytes = secret.getEncoded();
-	private static final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
+	/*
+	 * private static final Key secret =
+	 * MacProvider.generateKey(SignatureAlgorithm.HS256); private static final
+	 * byte[] secretBytes = secret.getEncoded(); private static final String
+	 * base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
+	 * 
+	 * @Override public String jwtToken(int id) {
+	 * 
+	 * long nowMillis = System.currentTimeMillis(); Date now = new Date(nowMillis);
+	 * 
+	 * JwtBuilder builder =
+	 * Jwts.builder().setSubject(String.valueOf(id)).setIssuedAt(now)
+	 * .signWith(SignatureAlgorithm.HS256, base64SecretBytes);
+	 * 
+	 * return builder.compact(); }
+	 * 
+	 * @Override public int parseJWT(String jwt) {
+	 * 
+	 * // This line will throw an exception if it is not a signed JWS (as expected)
+	 * Claims claims =
+	 * Jwts.parser().setSigningKey(base64SecretBytes).parseClaimsJws(jwt).getBody();
+	 * 
+	 * System.out.println("Subject: " + claims.getSubject());
+	 * 
+	 * return Integer.parseInt(claims.getSubject()); }
+	 */
 
 	@Override
-	public String jwtToken(int id) {
-
-		long nowMillis = System.currentTimeMillis();
-		Date now = new Date(nowMillis);
-
-		JwtBuilder builder = Jwts.builder().setSubject(String.valueOf(id)).setIssuedAt(now).signWith(SignatureAlgorithm.HS256,
-				base64SecretBytes);
-
-		return builder.compact();
-	}
-
-	@Override
-	public int parseJWT(String jwt) {
-
-		// This line will throw an exception if it is not a signed JWS (as expected)
-		Claims claims = Jwts.parser().setSigningKey(base64SecretBytes).parseClaimsJws(jwt).getBody();
-
-		System.out.println("Subject: " + claims.getSubject());
-
-		return Integer.parseInt(claims.getSubject());
-	}
-
-	@Override
-	public UserDetails updateUser(String token,UserDetails user) {
-		int varifiedUserId=parseJWT(token);
+	public UserDetails updateUser(String token, UserDetails user) {
+		int varifiedUserId = tokenClass.parseJWT(token);
 		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
 		UserDetails presentUser = maybeUser.map(existingUser -> {
-			existingUser.setEmail(user.getEmail() !=null ? user.getEmail() : maybeUser.get().getEmail());
-			existingUser.setMobileNo(user.getMobileNo() !=null ? user.getMobileNo() : maybeUser.get().getMobileNo());
-			existingUser.setUserName(user.getUserName() !=null ? user.getUserName() : maybeUser.get().getUserName());
-			existingUser.setPassword(user.getPassword() !=null ? user.getPassword() : maybeUser.get().getPassword());
+			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
+			existingUser.setMobileNo(user.getMobileNo() != null ? user.getMobileNo() : maybeUser.get().getMobileNo());
+			existingUser.setUserName(user.getUserName() != null ? user.getUserName() : maybeUser.get().getUserName());
+			existingUser.setPassword(user.getPassword() != null ? user.getPassword() : maybeUser.get().getPassword());
 			return existingUser;
 		}).orElseThrow(() -> new RuntimeException("User Not Found"));
-		
+
 		return UserRegistration(presentUser);
 	}
 
 	@Override
 	public boolean deleteUser(String token) {
-int varifiedUserId = parseJWT(token);
-		
-		//return userRep.deleteById(varifiedUserId);
+		int varifiedUserId = tokenClass.parseJWT(token);
+
+		// return userRep.deleteById(varifiedUserId);
 		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
 		return maybeUser.map(existingUser -> {
 			userRepository.delete(existingUser);
 			return true;
-			}).orElseGet(() -> false);
+		}).orElseGet(() -> false);
 	}
 
 	@Override
 	public List<UserDetails> findByEmailId(String email) {
-		
+
 		return userRepository.findByEmail(email);
 	}
+
 	@Override
-	public Optional<UserDetails> findById(int id)
-	{
+	public Optional<UserDetails> findById(int id) {
 		return userRepository.findByUserId(id);
 	}
-	public String sendmail(String subject, UserDetails userdetails,String appUrl) {
+
+	public String sendmail(String subject, UserDetails userdetails, String appUrl) {
 		MimeMessage message = sender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
-		
+
 		try {
 
 			helper.setTo(userdetails.getEmail());
@@ -153,5 +147,5 @@ int varifiedUserId = parseJWT(token);
 		sender.send(message);
 		return "Mail Sent Success!";
 	}
-	
+
 }
