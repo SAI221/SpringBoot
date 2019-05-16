@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.springbootform.model.UserDetails;
+import com.bridgelabz.springbootform.repository.UserRepository;
 import com.bridgelabz.springbootform.service.UserService;
 import com.bridgelabz.springbootform.token.TokenClass;
 
@@ -28,6 +29,9 @@ public class MailController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Autowired
 	TokenClass tokenClass;
@@ -72,8 +76,8 @@ public class MailController {
 		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
 			Optional<UserDetails> userList = userService.findById(id);
-			userList.get().setPassword(password);
-			userService.UserRegistration(userList.get());
+			userList.get().setPassword(userService.securePassword(password));
+			userRepository.save(userList.get());
 			return "Changed";
 		} else
 			return "Not changed";
@@ -105,7 +109,7 @@ public class MailController {
 		if (id >= 0) {
 			Optional<UserDetails> userList = userService.findById(id);
 			userList.get().setActiveStatus(1);
-			userService.UserRegistration(userList.get());
+			userRepository.save(userList.get());
 			return "Changed";
 		} else
 			return "Not changed";

@@ -1,5 +1,7 @@
 package com.bridgelabz.springbootform.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +19,8 @@ public class RegistrationController {
 	UserService userService;
 
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
-	public UserDetails createStudent(@RequestBody UserDetails user) {
-		return userService.UserRegistration(user);
+	public UserDetails createStudent(@RequestBody UserDetails user,HttpServletRequest request) {
+		return userService.UserRegistration(user,request);
 	}
 
 }
