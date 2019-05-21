@@ -1,5 +1,4 @@
-package com.bridgelabz.springbootform.service;
-
+package com.bridgelabz.fundoonoteapp.service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -14,9 +13,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.bridgelabz.springbootform.model.UserDetails;
-import com.bridgelabz.springbootform.repository.UserRepository;
-import com.bridgelabz.springbootform.token.TokenClass;
+import com.bridgelabz.fundoonoteapp.model.UserDetails;
+import com.bridgelabz.fundoonoteapp.repository.UserRepository;
+import com.bridgelabz.fundoonoteapp.service.UserService;
+import com.bridgelabz.fundoonoteapp.util.TokenClass;
 
 @Service
 public class UserServiceImpl implements UserService {

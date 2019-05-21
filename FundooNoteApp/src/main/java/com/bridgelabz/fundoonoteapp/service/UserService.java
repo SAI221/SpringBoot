@@ -1,11 +1,10 @@
-package com.bridgelabz.springbootform.service;
-
+package com.bridgelabz.fundoonoteapp.service;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.bridgelabz.springbootform.model.UserDetails;
+import com.bridgelabz.fundoonoteapp.model.UserDetails;
 
 public interface UserService {
 
@@ -19,12 +18,6 @@ public interface UserService {
 	
 	public String securePassword(String password);
 
-	/*
-	 * public String jwtToken(int id);
-	 * 
-	 * public int parseJWT(String jwt);
-	 */
-	
 	public List<UserDetails> findByEmailId(String email);
 	
 	public Optional<UserDetails> findById(int id);

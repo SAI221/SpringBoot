@@ -1,7 +1,5 @@
-package com.bridgelabz.springbootform.service;
+package com.bridgelabz.fundonoteapp.service.impl;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,31 +11,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.bridgelabz.springbootform.model.UserDetails;
-import com.bridgelabz.springbootform.repository.UserRepository;
-import com.bridgelabz.springbootform.token.TokenClass;
+import com.bridgelabz.fundonoteapp.model.Login;
+import com.bridgelabz.fundonoteapp.model.UserDetails;
+import com.bridgelabz.fundonoteapp.repository.UserRepository;
+import com.bridgelabz.fundonoteapp.service.UserService;
+import com.bridgelabz.fundonoteapp.util.JwtUtil;
+import com.bridgelabz.fundonoteapp.util.PasswordEncryption;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
 
 	@Autowired
 	JavaMailSender sender;
-	@Autowired
-	TokenClass tokenClass;
+	
 
 	@Override
 	public UserDetails UserRegistration(UserDetails user,HttpServletRequest request) {
-		System.out.println(securePassword(user.getPassword()));
-		user.setPassword(securePassword(user.getPassword()));
+		System.out.println(PasswordEncryption.securePassword(user.getPassword()));
+		user.setPassword(PasswordEncryption.securePassword(user.getPassword()));
 		 userRepository.save(user);
 		Optional<UserDetails> user1 = userRepository.findByUserId(user.getUserId());
 		if (user1 != null) {
 			System.out.println("Sucessfull reg");
 			// Optional<User> maybeUser = userRep.findById(user.getId());
-			String tokenGen = tokenClass.jwtToken(user1.get().getUserId());
+			String tokenGen = JwtUtil.jwtToken(user1.get().getUserId());
 			UserDetails u = user1.get();
 			StringBuffer requestUrl = request.getRequestURL();
 			System.out.println(requestUrl);
@@ -58,48 +60,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDetails> login(UserDetails user) {
+	public List<UserDetails> login(Login user) {
 		List<UserDetails> userList = userRepository.findByEmailAndPassword(user.getEmail(),
-				securePassword(user.getPassword()));
+				PasswordEncryption.securePassword(user.getPassword()));
 		return userList;
 	}
-@Override
-	public String securePassword(String password) {
-		String generatedPassword = null;
-		try {
-			// Create MessageDigest instance for MD5
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			// Add password bytes to digest
-			md.update(password.getBytes());
-			// Get the hash's bytes
-			byte[] bytes = md.digest();
-			// This bytes[] has bytes in decimal format;
-			// Convert it to hexadecimal format
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < bytes.length; i++) {
-				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-			}
-			// Get complete hashed password in hex format
-			generatedPassword = sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		System.out.println(generatedPassword);
-
-		return generatedPassword;
-	}
-
-
 
 	@Override
 	public UserDetails updateUser(String token, UserDetails user) {
-		int varifiedUserId = tokenClass.parseJWT(token);
+		int varifiedUserId = JwtUtil.parseJWT(token);
 		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
 		UserDetails presentUser = maybeUser.map(existingUser -> {
 			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
 			existingUser.setMobileNo(user.getMobileNo() != null ? user.getMobileNo() : maybeUser.get().getMobileNo());
 			existingUser.setUserName(user.getUserName() != null ? user.getUserName() : maybeUser.get().getUserName());
-			existingUser.setPassword(user.getPassword() != null ? securePassword(user.getPassword()) :securePassword(maybeUser.get().getPassword()));
+			existingUser.setPassword(user.getPassword() != null ? PasswordEncryption.securePassword(user.getPassword()) :PasswordEncryption.securePassword(maybeUser.get().getPassword()));
 			return existingUser;
 		}).orElseThrow(() -> new RuntimeException("User Not Found"));
 
@@ -108,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean deleteUser(String token) {
-		int varifiedUserId = tokenClass.parseJWT(token);
+		int varifiedUserId = JwtUtil.parseJWT(token);
 
 		// return userRep.deleteById(varifiedUserId);
 		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
@@ -150,6 +125,12 @@ public class UserServiceImpl implements UserService {
 	public List<UserDetails> fetchData() {
 		
 		return userRepository.findAll();
+	}
+
+	@Override
+	public UserDetails save(UserDetails user) {
+		
+		return userRepository.save(user);
 	}
 
 }

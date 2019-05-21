@@ -1,30 +1,25 @@
-package com.bridgelabz.springbootform.service;
+package com.bridgelabz.fundonoteapp.service;
 
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.bridgelabz.springbootform.model.UserDetails;
+import com.bridgelabz.fundonoteapp.model.Login;
+import com.bridgelabz.fundonoteapp.model.UserDetails;
 
 public interface UserService {
+	
+	public UserDetails save(UserDetails user);
 
 	public UserDetails UserRegistration(UserDetails user,HttpServletRequest request);
 
-	public List<UserDetails> login(UserDetails user);
+	public List<UserDetails> login(Login email);
 
 	public UserDetails updateUser(String token,UserDetails user);
 
 	public boolean deleteUser(String token);
-	
-	public String securePassword(String password);
 
-	/*
-	 * public String jwtToken(int id);
-	 * 
-	 * public int parseJWT(String jwt);
-	 */
-	
 	public List<UserDetails> findByEmailId(String email);
 	
 	public Optional<UserDetails> findById(int id);

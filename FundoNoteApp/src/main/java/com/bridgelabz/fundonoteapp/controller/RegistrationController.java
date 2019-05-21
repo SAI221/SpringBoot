@@ -1,4 +1,4 @@
-package com.bridgelabz.springbootform.controller;
+package com.bridgelabz.fundonoteapp.controller;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.springbootform.model.UserDetails;
-import com.bridgelabz.springbootform.service.UserService;
+import com.bridgelabz.fundonoteapp.model.UserDetails;
+import com.bridgelabz.fundonoteapp.service.UserService;
 
 @RestController
 
@@ -20,7 +20,7 @@ public class RegistrationController {
 	@Autowired
 	UserService userService;
 
-	@RequestMapping(value = "/registration", method = RequestMethod.POST)
+	@RequestMapping(value="/registration", method = RequestMethod.POST)
 	public UserDetails createStudent(@RequestBody UserDetails user,HttpServletRequest request) {
 		return userService.UserRegistration(user,request);
 	}
