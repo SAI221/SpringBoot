@@ -36,16 +36,18 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String login(User user) {
 		System.out.println(user.getUserName());
-		String encryptedPassword = securePassword(user);
-		System.out.println(encryptedPassword);
+		/*
+		 * String encryptedPassword = securePassword(user);
+		 * System.out.println(encryptedPassword);
+		 */
 
-		List<User> userList = userRepository.findByUserNameAndPassword(user.getUserName(), encryptedPassword);
+		List<User> userList = userRepository.findByUserNameAndPassword(user.getUserName(), user.getPassword()/*encryptedPassword*/);
 		System.out.println(userList);
 
 		if (userList.size() != 0) {
 			System.out.println(user.getEmail());
 
-			return "Welcome  " + user.getUserName() + "   Jwt Token--->" + jwtToken(user.getUserName());
+			return "Welcome";
 		} else
 			return "invalid User Details";
 

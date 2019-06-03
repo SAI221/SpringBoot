@@ -12,7 +12,7 @@ public interface NoteService {
 
 	public Note updateNote(Note note, String token);
 
-	public String deleteNote(int noteId, String token);
+	public String deleteNote(int noteId,String token);
 
 	public Note getNoteInfo(int noteId);
 

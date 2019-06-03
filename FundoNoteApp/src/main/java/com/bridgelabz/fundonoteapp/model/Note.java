@@ -1,6 +1,6 @@
 package com.bridgelabz.fundonoteapp.model;
 
-import java.time.LocalTime;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,8 +12,8 @@ public class Note {
 	private String title;
 	private String description;
 
-	private LocalTime createdOn;
-	private LocalTime updatedOn;
+	private Timestamp createdOn;
+	private Timestamp updatedOn;
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
@@ -59,19 +59,21 @@ public class Note {
 		this.description = description;
 	}
 
-	public LocalTime getCreatedOn() {
+	
+
+	public Timestamp getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(LocalTime createdOn) {
+	public void setCreatedOn(Timestamp createdOn) {
 		this.createdOn = createdOn;
 	}
 
-	public LocalTime getUpdatedOn() {
+	public Timestamp getUpdatedOn() {
 		return updatedOn;
 	}
 
-	public void setUpdatedOn(LocalTime updatedOn) {
+	public void setUpdatedOn(Timestamp updatedOn) {
 		this.updatedOn = updatedOn;
 	}
 

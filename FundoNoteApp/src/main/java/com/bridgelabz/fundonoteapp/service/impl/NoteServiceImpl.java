@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonoteapp.service.impl;
 
-import java.time.LocalTime;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,12 @@ public class NoteServiceImpl implements NoteService {
 	public Note createNote(Note note, String token) {
 		int userId = JwtUtil.parseJWT(token);
 		System.out.println(userId);
-		LocalTime time=LocalTime.now();
-		/*
-		 * Date date = new Date(); Timestamp ts = new Timestamp(date.getTime());
-		 */
-		note.setCreatedOn(time);
+//		LocalTime time=LocalTime.now();
+		
+		  Date date = new Date(); 
+		  Timestamp ts = new Timestamp(date.getTime());
+		 
+		note.setCreatedOn(ts);
 		note.setUserId(userId);
 		return noteRepository.save(note);
 	}
@@ -46,13 +48,14 @@ public class NoteServiceImpl implements NoteService {
 
 	@Override
 	public Note updateNote(Note note, String token) {
-		int noteId = note.getNoteId();
+		
 		int userId = JwtUtil.parseJWT(token);
-		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(noteId, userId);
-		/*
-		 * Date date = new Date(); Timestamp ts = new Timestamp(date.getTime());
-		 */
-		LocalTime time=LocalTime.now();
+		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(note.getNoteId(), userId);
+		
+		  Date date = new Date();
+		  Timestamp ts = new Timestamp(date.getTime());
+		 
+		//LocalTime time=LocalTime.now();
 		noteInfo.forEach(existingUser -> {
 			existingUser
 					.setCreatedOn(note.getCreatedOn() != null ? note.getCreatedOn() : noteInfo.get(0).getCreatedOn());
@@ -64,13 +67,13 @@ public class NoteServiceImpl implements NoteService {
 			 * : noteInfo.get(0).getUpdatedOn());
 			 */
 		});
-		noteInfo.get(0).setUpdatedOn(time);
+		noteInfo.get(0).setUpdatedOn(ts);
 		return noteRepository.save(noteInfo.get(0));
 
 	}
 
 	@Override
-	public String deleteNote(int noteId, String token) {
+	public String deleteNote( int noteId,String token) {
 		int userId = JwtUtil.parseJWT(token);
 		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(noteId, userId);
 		noteRepository.delete(noteInfo.get(0));

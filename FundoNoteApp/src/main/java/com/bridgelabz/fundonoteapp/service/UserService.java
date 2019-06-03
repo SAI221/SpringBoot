@@ -20,11 +20,13 @@ public interface UserService {
 
 	public boolean deleteUser(String token);
 
-	public List<UserDetails> findByEmailId(String email);
+	public Optional<UserDetails> findByEmailId(String email);
 	
 	public Optional<UserDetails> findById(int id);
 	
 	public String sendmail(String subject, UserDetails userdetails,String appUrl);
 
 	public List<UserDetails> fetchData(); 
+	
+	public UserDetails update(String token,UserDetails user);
 }

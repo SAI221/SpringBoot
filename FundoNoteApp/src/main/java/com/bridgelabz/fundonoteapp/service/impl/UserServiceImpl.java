@@ -24,18 +24,17 @@ import com.bridgelabz.fundonoteapp.util.PasswordEncryption;
 @Transactional
 public class UserServiceImpl implements UserService {
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
-	JavaMailSender sender;
-	
+	private JavaMailSender sender;
 
 	@Override
-	public UserDetails UserRegistration(UserDetails user,HttpServletRequest request) {
+	public UserDetails UserRegistration(UserDetails user, HttpServletRequest request) {
 		System.out.println(PasswordEncryption.securePassword(user.getPassword()));
 		user.setPassword(PasswordEncryption.securePassword(user.getPassword()));
-		 userRepository.save(user);
-		Optional<UserDetails> user1 = userRepository.findByUserId(user.getUserId());
+		userRepository.save(user);
+		Optional<UserDetails> user1 = userRepository.findByEmail(user.getEmail());
 		if (user1 != null) {
 			System.out.println("Sucessfull reg");
 			// Optional<User> maybeUser = userRep.findById(user.getId());
@@ -55,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
 		} else {
 			System.out.println("Not sucessful reg");
-}
+		}
 		return user;
 	}
 
@@ -74,7 +73,8 @@ public class UserServiceImpl implements UserService {
 			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
 			existingUser.setMobileNo(user.getMobileNo() != null ? user.getMobileNo() : maybeUser.get().getMobileNo());
 			existingUser.setUserName(user.getUserName() != null ? user.getUserName() : maybeUser.get().getUserName());
-			existingUser.setPassword(user.getPassword() != null ? PasswordEncryption.securePassword(user.getPassword()) :PasswordEncryption.securePassword(maybeUser.get().getPassword()));
+			existingUser.setPassword(user.getPassword() != null ? PasswordEncryption.securePassword(user.getPassword())
+					: PasswordEncryption.securePassword(maybeUser.get().getPassword()));
 			return existingUser;
 		}).orElseThrow(() -> new RuntimeException("User Not Found"));
 
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDetails> findByEmailId(String email) {
+	public Optional<UserDetails> findByEmailId(String email) {
 
 		return userRepository.findByEmail(email);
 	}
@@ -123,14 +123,26 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDetails> fetchData() {
-		
+
 		return userRepository.findAll();
 	}
 
 	@Override
 	public UserDetails save(UserDetails user) {
-		
+
 		return userRepository.save(user);
+	}
+
+	@Override
+	public UserDetails update(String token,UserDetails user) {
+		int varifiedUserId = JwtUtil.parseJWT(token);
+		if(varifiedUserId==user.getUserId()) 
+			return userRepository.save(user);
+		return user;
+		
+		
+		
+		
 	}
 
 }

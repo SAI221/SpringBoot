@@ -6,6 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,41 +22,43 @@ import com.bridgelabz.fundonoteapp.service.UserService;
 import com.bridgelabz.fundonoteapp.util.JwtUtil;
 
 @RestController
-
+@CrossOrigin(origins = "*", allowedHeaders = "*") 
+@RequestMapping("/")
 public class LoginController {
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 	
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String userLogin(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response) {
+	@PostMapping(value = "/login")
+	public ResponseEntity<?> userLogin(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response) {
 		List<UserDetails> userList = userService.login(login);
 		if (userList.size() != 0) {
 			String token = JwtUtil.jwtToken(userList.get(0).getUserId());
-			response.setHeader("JwtToken", token);
-			return "Welcome " + userList.get(0).getUserName() + " JWT--->" + token;
+			response.setHeader("token", token);
+			return new ResponseEntity<>(
+					/*"Welcome "+ userList.get(0).getUserName() + "   Jwt Token--->" + response.getHeader("token")*/HttpStatus.OK);
 		} else
-			return "Invalid Credentials";
+			return new ResponseEntity<String>("{Invalid Credentials}",HttpStatus.BAD_REQUEST);
 
 	}
 
 	// UPDATE
-	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	public String userUpdate(HttpServletRequest request, @RequestBody UserDetails user) {
-		String token = request.getHeader("jwtToken");
+	@PutMapping(value = "/update")
+	public ResponseEntity<String> userUpdate(HttpServletRequest request, @RequestBody UserDetails user) {
+		String token = request.getHeader("token");
 		System.out.println(token);
-		userService.updateUser(token, user);
-			return "Updated";
+		userService.update(token, user);
+			return new ResponseEntity<String>("Updated",HttpStatus.ACCEPTED);
 		
 	}
 
 	// DELETE
 	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-	public String userDelete(HttpServletRequest request) {
-		String token = request.getHeader("jwtToken");
+	public ResponseEntity<String> userDelete(HttpServletRequest request) {
+		String token = request.getHeader("token");
 		System.out.println(token);
 		userService.deleteUser(token);
-		return "Deleted";
+		return new ResponseEntity<String>("Deleted",HttpStatus.OK);
 
 	}
 }
