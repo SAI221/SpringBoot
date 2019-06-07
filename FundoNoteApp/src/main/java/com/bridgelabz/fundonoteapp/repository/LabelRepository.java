@@ -13,4 +13,8 @@ public interface LabelRepository extends JpaRepositoryImplementation<Label, Long
 
 	List<Label> findByUserIdAndLabelId(int userId, int labelId);
 
+	List<Label> findByNoteIdAndLabelId(int noteId, int labelId);
+
+	
+
 }

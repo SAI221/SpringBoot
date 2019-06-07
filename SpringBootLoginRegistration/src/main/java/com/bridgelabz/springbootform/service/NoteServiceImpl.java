@@ -1,6 +1,7 @@
 package com.bridgelabz.springbootform.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -30,8 +31,9 @@ public class NoteServiceImpl implements NoteService {
 	public Note createNote(Note note, String token) {
 		int userId = tokenClass.parseJWT(token);
 		System.out.println(userId);
-		Date date = new Date();
-		Timestamp ts = new Timestamp(date.getTime());
+//		Date date = new Date();
+//		Timestamp ts = new Timestamp(date.getTime());
+		LocalDateTime ts=LocalDateTime.now();
 		note.setCreatedOn(ts);
 		note.setUserId(userId);
 		return noteRepository.save(note);
@@ -48,8 +50,9 @@ public class NoteServiceImpl implements NoteService {
 		int noteId = note.getNoteId();
 		int userId = tokenClass.parseJWT(token);
 		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(noteId, userId);
-		Date date = new Date();
-		Timestamp ts = new Timestamp(date.getTime());
+//		Date date = new Date();
+//		Timestamp ts = new Timestamp(date.getTime());
+		LocalDateTime ts=LocalDateTime.now();
 		noteInfo.forEach(existingUser -> {
 			existingUser
 					.setCreatedOn(note.getCreatedOn() != null ? note.getCreatedOn() : noteInfo.get(0).getCreatedOn());

@@ -35,8 +35,10 @@ public class LoginController {
 		if (userList.size() != 0) {
 			String token = JwtUtil.jwtToken(userList.get(0).getUserId());
 			response.setHeader("token", token);
-			return new ResponseEntity<>(
-					/*"Welcome "+ userList.get(0).getUserName() + "   Jwt Token--->" + response.getHeader("token")*/HttpStatus.OK);
+			response.addHeader("Access-Control-Allow-Headers", "*");
+			response.addHeader("Access-Control-Expose-Headers", "*");
+			return new ResponseEntity<>(HttpStatus.OK);
+					/*"Welcome "+ userList.get(0).getUserName() + "   Jwt Token--->" + response.getHeader("token")*/
 		} else
 			return new ResponseEntity<String>("{Invalid Credentials}",HttpStatus.BAD_REQUEST);
 

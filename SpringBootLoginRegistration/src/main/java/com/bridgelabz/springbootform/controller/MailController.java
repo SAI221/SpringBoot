@@ -9,8 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +24,9 @@ import com.bridgelabz.springbootform.model.UserDetails;
 import com.bridgelabz.springbootform.repository.UserRepository;
 import com.bridgelabz.springbootform.service.UserService;
 import com.bridgelabz.springbootform.token.TokenClass;
+
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 
 @RestController
 public class MailController {
@@ -53,15 +60,15 @@ public class MailController {
 		return "Mail Sent Success!";
 	}
 
-	@RequestMapping(value = "/forgot", method = RequestMethod.POST)
+	@RequestMapping(value = "/forgot/{token}", method = RequestMethod.POST)
 	public String forgotPassword(@RequestBody UserDetails user, HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response,@PathVariable String token) {
 		List<UserDetails> list = userService.findByEmailId(user.getEmail());
 		if (list.size() == 0) {
 			return "We didn't find an account for that e-mail address.";
 		} else {
 			UserDetails userdetails = list.get(0);
-			String token = tokenClass.jwtToken(userdetails.getUserId());
+		//	String token = tokenClass.jwtToken(userdetails.getUserId());
 			response.setHeader("token", token);
 			String subject = "Password Reset Request";
 			String appUrl = "request.getScheme() " + "://" + request.getServerName() + "/reset?token=" + token;
@@ -69,9 +76,10 @@ public class MailController {
 		}
 	}
 
-	@RequestMapping(value = "/reset", method = RequestMethod.PUT)
-	public String changePassword(HttpServletRequest request, @RequestBody String password) {
-		String token = request.getHeader("token");
+	@RequestMapping(value = "/reset/{token}", method = RequestMethod.PUT)
+	public String changePassword(HttpServletRequest request, @RequestBody String password,
+			@PathVariable String token) {
+		//String token = request.getHeader("token");
 
 		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
@@ -84,9 +92,9 @@ public class MailController {
 
 	}
 
-	@RequestMapping(value = "/mail", method = RequestMethod.POST)
-	public String mailForActivation(HttpServletRequest request) {
-		String token = request.getHeader("token");
+	@RequestMapping(value = "/mail/{token}", method = RequestMethod.POST)
+	public String mailForActivation(HttpServletRequest request,@PathVariable String token) {
+		//String token = request.getHeader("token");
 		int userId = tokenClass.parseJWT(token);
 		Optional<UserDetails> list = userService.findById(userId);
 		if (list == null) {
@@ -101,9 +109,9 @@ public class MailController {
 
 	}
 
-	@RequestMapping(value = "/active", method = RequestMethod.PUT)
-	public String activeStatus(HttpServletRequest request) {
-		String token = request.getHeader("token");
+	@RequestMapping(value = "/active/{token}", method = RequestMethod.PUT)
+	public String activeStatus(HttpServletRequest request,@PathVariable String token) {
+		//String token = request.getHeader("token");
 
 		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
@@ -114,5 +122,21 @@ public class MailController {
 		} else
 			return "Not changed";
 	}
+	
+//	@Cacheable(value = "users", key = "#userId")
+//	@GetMapping("/testRedis/{userId}")
+//	//@ApiResponse(response = String.class, message = "Test Redis	", code = 200)
+//	public String testRedis(@ApiParam("userId") @PathVariable String userId) {
+//	return "Success" + userId;
+//	}
+//
+//	//@CachePut(key = "test")
+//	@Cacheable(value = "users", key = "#userId")
+//	@PostMapping("/testRedis/{userId}")
+//	@ApiResponse(response = String.class, message = "Test Redis post", code = 200)
+//	public String postRedis(@ApiParam("userId") @PathVariable String userId) {
+//		
+//	return "{}";
+//	}
 
 }

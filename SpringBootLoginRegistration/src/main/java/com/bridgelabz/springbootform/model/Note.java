@@ -2,7 +2,7 @@ package com.bridgelabz.springbootform.model;
 
 
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,10 +13,8 @@ public class Note {
 	private int noteId;
 	private String title;
 	private String description;
-	
-	
-	private Timestamp createdOn;
-	private Timestamp updatedOn;
+	private LocalDateTime createdOn;
+	private LocalDateTime updatedOn;
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
@@ -62,19 +60,19 @@ public class Note {
 		this.description = description;
 	}
 
-	public Timestamp getCreatedOn() {
+	public LocalDateTime getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(Timestamp createdOn) {
+	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
 
-	public Timestamp getUpdatedOn() {
+	public LocalDateTime getUpdatedOn() {
 		return updatedOn;
 	}
 
-	public void setUpdatedOn(Timestamp updatedOn) {
+	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
 

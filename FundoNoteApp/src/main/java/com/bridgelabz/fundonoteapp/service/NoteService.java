@@ -19,6 +19,10 @@ public interface NoteService {
 	public List<Note> getAllNotes();
 
 	public List<Note> getNotes(String token);
+	
+	public List<Note> getNotesInTrash(String token);
+	
+	public List<Note> getNotesInArchive(String Token);
 
 	public Label labelCreate(Label label, String token);
 
@@ -27,4 +31,8 @@ public interface NoteService {
 	public String labelDelete(String token, int labelId);
 
 	public List<Label> getLabels(String token);
+
+	public Label createNoteLabel(String token, Label label,int noteId);
+
+	public Label noteLabelUpdate(Label label, int noteId);
 }

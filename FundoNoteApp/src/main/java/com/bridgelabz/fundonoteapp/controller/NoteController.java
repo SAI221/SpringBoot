@@ -66,4 +66,16 @@ public class NoteController {
 		String token = request.getHeader("token");
 		return noteService.getNotes(token);
 	}
+	
+	@GetMapping(value = "/notesInTrash")
+	public List<Note> notesInTrash(HttpServletRequest request){
+		String token = request.getHeader("token");
+		return noteService.getNotesInTrash(token);
+	}
+	
+	@GetMapping(value ="/notesInArchive")
+	public List<Note> notesInArchive(HttpServletRequest request){
+		String token= request.getHeader("token");
+		return noteService.getNotesInArchive(token);
+	}
 }

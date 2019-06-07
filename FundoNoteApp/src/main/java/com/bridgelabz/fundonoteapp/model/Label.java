@@ -6,10 +6,18 @@ import javax.persistence.Id;
 @Entity
 public class Label {
 	@Id
-
 	private int labelId;
 	private String labelName;
 	private int userId;
+	private int noteId;
+
+	public int getNoteId() {
+		return noteId;
+	}
+
+	public void setNoteId(int noteId) {
+		this.noteId = noteId;
+	}
 
 	public int getLabelId() {
 		return labelId;

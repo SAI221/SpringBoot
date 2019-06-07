@@ -55,5 +55,17 @@ public class LabelController {
 		String token = request.getHeader("token");
 		return new ResponseEntity<List<Label>>(noteService.getLabels(token),HttpStatus.FOUND);
 	}
+	
+	@PostMapping(value="/notelabel/{noteId}")
+	public ResponseEntity<Label> createNoteLabel(@PathVariable int noteId,@RequestBody Label label,HttpServletRequest request){
+		String token = request.getHeader("token");
+		return new ResponseEntity<Label>(noteService.createNoteLabel(token,label,noteId),HttpStatus.OK);
+	}
+	
+	@PutMapping(value="/update/{noteId}")
+	public ResponseEntity<Label> updateNoteLabel(@PathVariable int noteId,@RequestBody Label label){
+		
+		return new ResponseEntity<Label>(noteService.noteLabelUpdate(label, noteId),HttpStatus.ACCEPTED);
+	}
 
 }

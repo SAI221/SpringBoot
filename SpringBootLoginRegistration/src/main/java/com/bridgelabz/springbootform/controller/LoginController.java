@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,9 +37,9 @@ public class LoginController {
 	}
 
 	// UPDATE
-	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	public String userUpdate(HttpServletRequest request, @RequestBody UserDetails user) {
-		String token = request.getHeader("jwtToken");
+	@RequestMapping(value = "/update/{token}", method = RequestMethod.PUT)
+	public String userUpdate(HttpServletRequest request, @RequestBody UserDetails user,@PathVariable String token) {
+		//String token = request.getHeader("jwtToken");
 		System.out.println(token);
 		userService.updateUser(token, user);
 			return "Updated";
@@ -46,9 +47,9 @@ public class LoginController {
 	}
 
 	// DELETE
-	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-	public String userDelete(HttpServletRequest request) {
-		String token = request.getHeader("jwtToken");
+	@RequestMapping(value = "/delete/{token}", method = RequestMethod.DELETE)
+	public String userDelete(HttpServletRequest request,@PathVariable String token) {
+		//String token = request.getHeader("jwtToken");
 		System.out.println(token);
 		userService.deleteUser(token);
 		return "Deleted";
