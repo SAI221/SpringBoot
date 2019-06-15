@@ -29,6 +29,7 @@ public class MailController {
 	@RequestMapping(value = "/forgot", method = RequestMethod.POST)
 	public ResponseEntity<String> forgotPassword(@RequestBody UserDetails user, HttpServletRequest request,
 			HttpServletResponse response) {
+		System.out.println(user);
 		Optional<UserDetails> list = userService.findByEmailId(user.getEmail());
 		if (list.isPresent()) {
 			return new ResponseEntity<String>("We didn't find an account for that e-mail address.",

@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonoteapp.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,13 +12,21 @@ public class Note {
 	private int noteId;
 	private String title;
 	private String description;
-
 	private Timestamp createdOn;
 	private Timestamp updatedOn;
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
 	private int userId;
+	private LocalDateTime remainder;
+
+	public LocalDateTime getRemainder() {
+		return remainder;
+	}
+
+	public void setRemainder(LocalDateTime remainder) {
+		this.remainder = remainder;
+	}
 
 	public int getUserId() {
 		return userId;
@@ -85,6 +94,7 @@ public class Note {
 		this.inTrash = inTrash;
 	}
 
+
 	public boolean isPinned() {
 		return isPinned;
 	}
@@ -93,4 +103,12 @@ public class Note {
 		this.isPinned = isPinned;
 	}
 
+	@Override
+	public String toString() {
+		return "Note [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdOn="
+				+ createdOn + ", updatedOn=" + updatedOn + ", inTrash=" + inTrash + ", isArchive=" + isArchive
+				+ ", isPinned=" + isPinned + ", userId=" + userId + ", remainder=" + remainder + "]";
+	}
+
+	
 }

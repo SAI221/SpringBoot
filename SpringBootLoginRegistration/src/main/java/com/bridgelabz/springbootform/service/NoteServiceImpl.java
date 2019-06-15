@@ -1,8 +1,6 @@
 package com.bridgelabz.springbootform.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +28,6 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public Note createNote(Note note, String token) {
 		int userId = tokenClass.parseJWT(token);
-		System.out.println(userId);
-//		Date date = new Date();
-//		Timestamp ts = new Timestamp(date.getTime());
 		LocalDateTime ts=LocalDateTime.now();
 		note.setCreatedOn(ts);
 		note.setUserId(userId);
@@ -50,8 +45,6 @@ public class NoteServiceImpl implements NoteService {
 		int noteId = note.getNoteId();
 		int userId = tokenClass.parseJWT(token);
 		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(noteId, userId);
-//		Date date = new Date();
-//		Timestamp ts = new Timestamp(date.getTime());
 		LocalDateTime ts=LocalDateTime.now();
 		noteInfo.forEach(existingUser -> {
 			existingUser
@@ -59,10 +52,9 @@ public class NoteServiceImpl implements NoteService {
 			existingUser.setDescription(
 					note.getDescription() != null ? note.getDescription() : noteInfo.get(0).getDescription());
 			existingUser.setTitle(note.getTitle() != null ? note.getTitle() : noteInfo.get(0).getTitle());
-			/*
-			 * existingUser .setUpdatedOn(note.getUpdatedOn() != null ? note.getUpdatedOn()
-			 * : noteInfo.get(0).getUpdatedOn());
-			 */
+			existingUser.setArchive(note.isArchive());
+			existingUser.setInTrash(note.isInTrash());
+			existingUser.setPinned(note.isPinned());
 		});
 		noteInfo.get(0).setUpdatedOn(ts);
 		return noteRepository.save(noteInfo.get(0));

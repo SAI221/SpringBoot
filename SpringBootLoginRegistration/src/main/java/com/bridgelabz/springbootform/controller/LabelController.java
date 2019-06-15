@@ -5,10 +5,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.springbootform.model.Label;
@@ -20,28 +21,28 @@ public class LabelController {
 	@Autowired
 	private NoteService noteService;
 
-	@RequestMapping(value = "/createlabel/{token}", method = RequestMethod.POST)
-	public Label createLabel(@RequestBody Label label,@PathVariable String token, HttpServletRequest request) {
-		//String token = request.getHeader("token");
+	@PostMapping(value = "/createlabel/{token}")
+	public Label createLabel(Label label, @PathVariable String token, HttpServletRequest request) {
 		return noteService.labelCreate(label, token);
 
 	}
 
-	@RequestMapping(value = "/updatelabel/{labelId}/{token}", method = RequestMethod.PUT)
-	public Label updateLabel(@RequestBody Label label, HttpServletRequest request,@PathVariable int labelId,String token ) {
-		//String token = request.getHeader("token");
-		return noteService.labelUpdate(label, token,labelId);
+	@PutMapping(value = "/updatelabel/{labelId}/{token}")
+	public Label updateLabel(Label label, HttpServletRequest request, @PathVariable int labelId,
+			String token) {
+
+		return noteService.labelUpdate(label, token, labelId);
 	}
 
-	@RequestMapping(value = "/deletelabel/{labelId}/{token}", method = RequestMethod.DELETE)
-	public String deleteLabel(@PathVariable int labelId,String token , HttpServletRequest request) {
-		//String token = request.getHeader("token");
+	@DeleteMapping(value = "/deletelabel/{labelId}/{token}")
+	public String deleteLabel(@PathVariable int labelId, String token, HttpServletRequest request) {
+
 		return noteService.labelDelete(token, labelId);
 	}
 
-	@RequestMapping(value = "/fetchlabels/{token}", method = RequestMethod.GET)
-	public List<Label> fetchLabels(HttpServletRequest request,@PathVariable String token ) {
-		//String token = request.getHeader("token");
+	@GetMapping(value = "/fetchlabels/{token}")
+	public List<Label> fetchLabels(HttpServletRequest request, @PathVariable String token) {
+
 		return noteService.getLabels(token);
 	}
 

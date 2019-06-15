@@ -47,7 +47,7 @@ public class NoteServiceImpl implements NoteService {
 
 	@Override
 	public Note updateNote(Note note, String token) {
-
+System.out.println(note.toString());
 		int userId = JwtUtil.parseJWT(token);
 		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(note.getNoteId(), userId);
 
@@ -64,12 +64,14 @@ public class NoteServiceImpl implements NoteService {
 			existingUser.setArchive(note.isArchive());
 			existingUser.setInTrash(note.isInTrash());
 			existingUser.setPinned(note.isPinned());
+			existingUser.setRemainder(note.getRemainder());
 			/*
 			 * existingUser .setUpdatedOn(note.getUpdatedOn() != null ? note.getUpdatedOn()
 			 * : noteInfo.get(0).getUpdatedOn());
 			 */
 		});
 		noteInfo.get(0).setUpdatedOn(ts);
+		System.out.println(noteInfo.get(0).toString());
 		return noteRepository.save(noteInfo.get(0));
 
 	}

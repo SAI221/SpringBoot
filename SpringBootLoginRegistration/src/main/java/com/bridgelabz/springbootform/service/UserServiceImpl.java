@@ -4,6 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -14,6 +16,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.bridgelabz.springbootform.controller.LoginController;
 import com.bridgelabz.springbootform.model.UserDetails;
 import com.bridgelabz.springbootform.repository.UserRepository;
 import com.bridgelabz.springbootform.token.TokenClass;
@@ -28,15 +31,16 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	TokenClass tokenClass;
 
+	private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
+
 	@Override
-	public UserDetails UserRegistration(UserDetails user,HttpServletRequest request) {
+	public UserDetails UserRegistration(UserDetails user, HttpServletRequest request) {
 		System.out.println(securePassword(user.getPassword()));
 		user.setPassword(securePassword(user.getPassword()));
-		 userRepository.save(user);
+		userRepository.save(user);
 		Optional<UserDetails> user1 = userRepository.findByUserId(user.getUserId());
-		if (user1 != null) {
-			System.out.println("Sucessfull reg");
-			// Optional<User> maybeUser = userRep.findById(user.getId());
+		if (user1.isPresent()) {
+			LOGGER.info("Sucessfull reg");
 			String tokenGen = tokenClass.jwtToken(user1.get().getUserId());
 			UserDetails u = user1.get();
 			StringBuffer requestUrl = request.getRequestURL();
@@ -48,12 +52,10 @@ public class UserServiceImpl implements UserService {
 
 			String s = sendmail(subject, u, appUrl);
 			System.out.println(s);
-			// return "Mail Sent Successfully";
 			return u;
 
-		} else {
-			System.out.println("Not sucessful reg");
-}
+		}
+			LOGGER.info("Not sucessful reg");
 		return user;
 	}
 
@@ -63,33 +65,31 @@ public class UserServiceImpl implements UserService {
 				securePassword(user.getPassword()));
 		return userList;
 	}
-@Override
+
+	@Override
 	public String securePassword(String password) {
 		String generatedPassword = null;
 		try {
-			// Create MessageDigest instance for MD5
+
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			// Add password bytes to digest
+
 			md.update(password.getBytes());
-			// Get the hash's bytes
+
 			byte[] bytes = md.digest();
-			// This bytes[] has bytes in decimal format;
-			// Convert it to hexadecimal format
+
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < bytes.length; i++) {
 				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
 			}
-			// Get complete hashed password in hex format
+
 			generatedPassword = sb.toString();
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE,"context", e);
 		}
-		System.out.println(generatedPassword);
+		LOGGER.info(generatedPassword);
 
 		return generatedPassword;
 	}
-
-
 
 	@Override
 	public UserDetails updateUser(String token, UserDetails user) {
@@ -99,7 +99,8 @@ public class UserServiceImpl implements UserService {
 			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
 			existingUser.setMobileNo(user.getMobileNo() != null ? user.getMobileNo() : maybeUser.get().getMobileNo());
 			existingUser.setUserName(user.getUserName() != null ? user.getUserName() : maybeUser.get().getUserName());
-			existingUser.setPassword(user.getPassword() != null ? securePassword(user.getPassword()) :securePassword(maybeUser.get().getPassword()));
+			existingUser.setPassword(user.getPassword() != null ? securePassword(user.getPassword())
+					: securePassword(maybeUser.get().getPassword()));
 			return existingUser;
 		}).orElseThrow(() -> new RuntimeException("User Not Found"));
 
@@ -110,7 +111,6 @@ public class UserServiceImpl implements UserService {
 	public boolean deleteUser(String token) {
 		int varifiedUserId = tokenClass.parseJWT(token);
 
-		// return userRep.deleteById(varifiedUserId);
 		Optional<UserDetails> maybeUser = userRepository.findByUserId(varifiedUserId);
 		return maybeUser.map(existingUser -> {
 			userRepository.delete(existingUser);
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
 			helper.setText("To reset your password, click the link below:\n" + appUrl);
 			helper.setSubject(subject);
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE,"context", e);
 			return "Error while sending mail ..";
 		}
 		sender.send(message);
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDetails> fetchData() {
-		
+
 		return userRepository.findAll();
 	}
 
